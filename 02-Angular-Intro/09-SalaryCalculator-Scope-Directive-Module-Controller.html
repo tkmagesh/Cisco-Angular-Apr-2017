@@ -43,9 +43,8 @@
 
 		angular
 			.module("myApp", [])
-			.run(function($rootScope){
-				console.log(arguments);
-				$rootScope.calculator = new SalaryCalculator();
+			.controller('salaryCalculatorController', function($scope){
+				$scope.calculator = new SalaryCalculator();
 			})
 		
 		
@@ -54,7 +53,7 @@
 <body ng-app="myApp">
 	<h1>Salary Calculator</h1>
 	<hr>
-	<div class="content">
+	<div class="content" ng-controller="salaryCalculatorController">
 		<div class="field">
 			<label for="">Basic :</label>
 			<input type="number" name="" id="txtBasic" ng-model="calculator.basic">
