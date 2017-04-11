@@ -43,8 +43,8 @@
 		(done) 1. Add a bug
 		(done) 2. List the bugs
 		(done) 3. Toggle the closed status of a bug
-		4. Remove closed bugs
-		5. Display statistics (# of closed bugs / total # of bugs)
+		(done) 4. Remove closed bugs
+		(done) 5. Display statistics (# of closed bugs / total # of bugs)
 		6. Search for bugs
 		7. Sort the bugs
 		8. Improvise the bug display
@@ -56,19 +56,45 @@
 	</script>
 	<script>
 		var bugTrackerApp = angular.module("bugTrackerApp", []);
-		bugTrackerApp.controller("bugsController", function($scope){
-			$scope.bugs = [];
-			$scope.addNew = function(newBugName){
-				var newBug = {
+
+		bugTrackerApp.value('bugOperations' , {
+			createNew : function(newBugName){
+				return {
 					name : newBugName,
 					isClosed : false
 				};
+			},
+			toggle : function(bug){
+				bug.isClosed = !bug.isClosed;
+			}
+		});
+
+		bugTrackerApp.controller("bugsController", function($scope, bugOperations){
+			$scope.bugs = [];
+			$scope.addNew = function(newBugName){
+				var newBug = bugOperations.createNew(newBugName);
 				$scope.bugs.push(newBug);
 			};
 
 			$scope.toggle = function(bug){
-				bug.isClosed = !bug.isClosed;
+				bugOperations.toggle(bug);
 			};
+
+			$scope.removeClosed = function(){
+				for(var index = $scope.bugs.length-1; index >= 0; index--){
+					if ($scope.bugs[index].isClosed)
+						$scope.bugs.splice(index,1);
+				}
+			};
+
+			$scope.getClosedCount = function(){
+				var closedCount = 0;
+				for(var index = 0; index < $scope.bugs.length; index++)
+					if ($scope.bugs[index].isClosed)
+						++closedCount;
+				return closedCount;
+			};
+
 		});
 
 	</script>
@@ -78,7 +104,7 @@
 	<hr>
 	<div class="content" ng-controller="bugsController">
 		<section class="stats">
-			<span class="closed">3</span>
+			<span class="closed">{{getClosedCount()}}</span>
 			<span> / </span>
 			<span>{{bugs.length}}</span>
 		</section>
@@ -113,7 +139,7 @@
 				</li>
 				
 			</ol>
-			<input type="button" value="Remove Closed">
+			<input type="button" value="Remove Closed" ng-click="removeClosed()">
 		</section>
 	</div>
 </body>
