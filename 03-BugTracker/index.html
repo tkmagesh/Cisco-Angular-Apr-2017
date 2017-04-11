@@ -38,10 +38,11 @@
 
 		}
 	</style>
+	<script src="angular.js"></script>
 	<script type="text/usecases">
-		1. Add a bug
-		2. List the bugs
-		3. Toggle the closed status of a bug
+		(done) 1. Add a bug
+		(done) 2. List the bugs
+		(done) 3. Toggle the closed status of a bug
 		4. Remove closed bugs
 		5. Display statistics (# of closed bugs / total # of bugs)
 		6. Search for bugs
@@ -53,15 +54,33 @@
 		12. Make the bugs accessible using unique urls
 
 	</script>
+	<script>
+		var bugTrackerApp = angular.module("bugTrackerApp", []);
+		bugTrackerApp.controller("bugsController", function($scope){
+			$scope.bugs = [];
+			$scope.addNew = function(newBugName){
+				var newBug = {
+					name : newBugName,
+					isClosed : false
+				};
+				$scope.bugs.push(newBug);
+			};
+
+			$scope.toggle = function(bug){
+				bug.isClosed = !bug.isClosed;
+			};
+		});
+
+	</script>
 </head>
-<body>
+<body ng-app="bugTrackerApp">
 	<h1>Bug Tracker</h1>
 	<hr>
-	<div class="content">
+	<div class="content" ng-controller="bugsController">
 		<section class="stats">
 			<span class="closed">3</span>
 			<span> / </span>
-			<span>5</span>
+			<span>{{bugs.length}}</span>
 		</section>
 		<section class="search">
 			<label for="">Search :</label>
@@ -80,20 +99,19 @@
 		</section>
 		<section class="edit">
 			<label for="">Bug Name :</label>
-			<input type="text">
-			<input type="button" value="Add New">
+			<input type="text" ng-model="bugName">
+			<input type="button" value="Add New" ng-click="addNew(bugName)">
 			<input type="button" value="Cancel">
 		</section>
 		<section class="list">
 			<ol>
-				<li>
-					<span class="bugname">This is test bug - 1</span>
+				<li ng-repeat="bug in bugs track by $index">
+					<span class="bugname" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">
+						{{bug.name}}
+					</span>
 					<div class="datetime">[Created At]</div>
 				</li>
-				<li>
-					<span class="bugname closed">This is test bug - 2</span>
-					<div class="datetime">[Created At]</div>
-				</li>
+				
 			</ol>
 			<input type="button" value="Remove Closed">
 		</section>
