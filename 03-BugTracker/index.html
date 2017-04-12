@@ -39,6 +39,7 @@
 		}
 	</style>
 	<script src="angular.js"></script>
+	<script src="moment.js"></script>
 	<script type="text/usecases">
 		(done) 1. Add a bug
 		(done) 2. List the bugs
@@ -63,7 +64,7 @@
 			   			- clear()
 			   			- length
 
-		10. Display 'createdAt'
+		(done) 10. Display 'createdAt'
 		11. Persist the bugs in the server
 		12. Make the bugs accessible using unique urls
 
@@ -180,7 +181,13 @@
 						++closedCount;
 				return closedCount;
 			}
-		})
+		});
+
+		bugTrackerApp.filter('elapsed', function(){
+			return function(data){
+				return moment(data).fromNow();
+			};
+		});
 
 	</script>
 </head>
@@ -224,7 +231,7 @@
 						{{bug.name | trimText:40}}
 					</span>
 					<span>[{{bug.id}}]</span>
-					<div class="datetime">[Created At]</div>
+					<div class="datetime">[{{ bug.createdAt | elapsed }}]</div>
 				</li>
 				
 			</ol>
