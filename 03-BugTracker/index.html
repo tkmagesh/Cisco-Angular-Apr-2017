@@ -47,7 +47,7 @@
 		(done) 5. Display statistics (# of closed bugs / total # of bugs)
 		(done) 6. Search for bugs
 		(done) 7. Sort the bugs
-		8. Improvise the bug display
+		(done) 8. Improvise the bug display
 		9. Persist the bugs in the localStorage
 		10. Display 'createdAt'
 		11. Persist the bugs in the server
@@ -89,7 +89,7 @@
 				];
 			}
 
-			$scope.bugs = getDefaultBugs();
+			$scope.bugs = [];
 
 			$scope.addNew = function(newBugName){
 				var newBug = bugOperations.createNew(newBugName);
@@ -107,15 +107,28 @@
 				}
 			};
 
-			$scope.getClosedCount = function(){
-				var closedCount = 0;
-				for(var index = 0; index < $scope.bugs.length; index++)
-					if ($scope.bugs[index].isClosed)
-						++closedCount;
-				return closedCount;
-			};
+			
 
 		});
+
+		bugTrackerApp.value('defaultTrimLength', 30);
+
+		bugTrackerApp.filter('trimText', function(defaultTrimLength){
+			return function(data, trimLength){
+				trimLength = trimLength || defaultTrimLength;
+				return data.length > trimLength ? data.substr(0,trimLength) + '...' : data;
+			};
+		});
+
+		bugTrackerApp.filter('closedCount', function(){
+			return function(data){
+				var closedCount = 0;
+				for(var index = 0; index < data.length; index++)
+					if (data[index].isClosed)
+						++closedCount;
+				return closedCount;
+			}
+		})
 
 	</script>
 </head>
@@ -125,7 +138,7 @@
 	<hr>
 	<div class="content" ng-controller="bugsController">
 		<section class="stats">
-			<span class="closed">{{getClosedCount()}}</span>
+			<span class="closed">{{ bugs  | closedCount }}</span>
 			<span> / </span>
 			<span>{{bugs.length}}</span>
 		</section>
@@ -156,7 +169,7 @@
 			<ol>
 				<li ng-repeat="bug in ( bugs | filter:searchBug | orderBy:sortBugBy:sortBugDescending ) ">
 					<span class="bugname" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">
-						{{bug.name}}
+						{{bug.name | trimText:40}}
 					</span>
 					<span>[{{bug.id}}]</span>
 					<div class="datetime">[Created At]</div>
