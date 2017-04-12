@@ -1,28 +1,16 @@
 {
   "bugs": [
     {
-      "id": 12,
-      "name": "validation error",
+      "id": 1,
+      "name": "User actions not recognized",
       "isClosed": false,
-      "createdAt": "2017-04-09T09:37:19.667Z"
+      "createdAt": "2017-04-12T08:59:46.824Z"
     },
     {
-      "id": 13,
-      "name": "Routing error",
+      "id": 4,
+      "name": "Server communication failure",
       "isClosed": false,
-      "createdAt": "2017-04-09T10:26:52.460Z"
-    },
-    {
-      "id": 14,
-      "name": "Data validation error",
-      "isClosed": false,
-      "createdAt": "2017-04-09T10:34:39.318Z"
-    },
-    {
-      "id": 15,
-      "name": "Thi si a new bug",
-      "isClosed": false,
-      "createdAt": "2017-04-09T10:39:44.005Z"
+      "createdAt": "2017-04-12T09:25:06.861Z"
     }
   ],
   "employees": [
