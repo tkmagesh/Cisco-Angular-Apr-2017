@@ -15,7 +15,7 @@ var app = (function(){
 	}
 
 	//Async
-	function addAsync(x,y, callback){
+	function addAsyncCallback(x,y, callback){
 		console.log('	[Service] processing ', x , ' and ', y);
 		setTimeout(function(){
 			var result = x + y;
@@ -25,16 +25,29 @@ var app = (function(){
 		}, 5000);
 	}
 
-	function addAsyncClient(x,y){
-		console.log('[Client] triggering addAsync');
-		addAsync(x,y, function(result){
+	function addAsyncCallbackClient(x,y){
+		console.log('[Client] triggering addAsyncCallback');
+		addAsyncCallback(x,y, function(result){
 			console.log('[Client] result = ', result);	
 		});
 		
 	}
 
+	function addAsyncPromise(x,y){
+		console.log('	[Service] processing ', x , ' and ', y);
+		var promise = new Promise(function(resolveFn, rejectFn){
+			setTimeout(function(){
+				var result = x + y;
+				console.log('	[Service] returning result');
+				resolveFn(result);
+			}, 5000);	
+		});
+		return promise;
+	}
+
 	return {
 		addSyncClient : addSyncClient,
-		addAsyncClient : addAsyncClient
+		addAsyncCallbackClient : addAsyncCallbackClient,
+		addAsyncPromise : addAsyncPromise
 	}
 })();
