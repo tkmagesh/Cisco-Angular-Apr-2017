@@ -48,7 +48,21 @@
 		(done) 6. Search for bugs
 		(done) 7. Sort the bugs
 		(done) 8. Improvise the bug display
-		9. Persist the bugs in the localStorage
+		(done) 9. Persist the bugs in the localStorage
+			   		window.localStorage
+			   		===================
+			   		* key/value store
+			   		* both key and value must be strings
+			   			(Note : use angular.toJson() and angular.fromJson() for serialization and deserialization respectively)
+			   		APIs
+			   		----
+			   			- setItem(key, value)
+			   			- getItem(key) // => value
+			   			- removeItem(key)
+			   			- key(index) // => key at index
+			   			- clear()
+			   			- length
+
 		10. Display 'createdAt'
 		11. Persist the bugs in the server
 		12. Make the bugs accessible using unique urls
@@ -62,14 +76,13 @@
 		
 
 		bugTrackerApp.factory('bugOperations' , function (defaultBugName){
-			
-			var counter = 0;
 			return {
-				createNew : function(newBugName){
+				createNew : function(bugId, newBugName){
 					return {
-						id : ++counter,
+						id : bugId,
 						name : newBugName || defaultBugName,
-						isClosed : false
+						isClosed : false,
+						createdAt : new Date()
 					};
 				},
 				toggle : function(bug){
@@ -78,32 +91,71 @@
 			};
 		});
 
-		bugTrackerApp.controller("bugsController", function($scope, bugOperations){
-			
-			function getDefaultBugs(){
-				return [
-					bugOperations.createNew('User actions not recognized'),
-					bugOperations.createNew('Data validation error'),
-					bugOperations.createNew('Server communication failure'),
-					bugOperations.createNew('Application not responsive')
-				];
+		bugTrackerApp.factory('bugStorage', function(bugOperations){
+			//private
+
+			var storage = window.localStorage;
+			var currentBugId = 0;
+
+			function getAllBugs(){
+				var result = [];
+				for(var index =0; index < storage.length; index++){
+					var data = storage.getItem(storage.key(index));
+					var bug = angular.fromJson(data);
+					currentBugId = currentBugId > bug.id ? currentBugId : bug.id;
+					result.push(bug);
+				}
+				return result;
 			}
 
-			$scope.bugs = [];
+			function addNewBug(bugName){
+				var newBug = bugOperations.createNew(++currentBugId, bugName);
+				saveBug(newBug);
+				return newBug;
+			}
+
+			function saveBug(bug){
+				storage.setItem(bug.id.toString(), angular.toJson(bug));
+			}
+
+			function toggleBug(bug){
+				bugOperations.toggle(bug);
+				saveBug(bug);
+			}
+
+			function removeBug(bug){
+				storage.removeItem(bug.id);
+			}
+			//public
+			return {
+				getAll : getAllBugs,
+				addNew : addNewBug,
+				toggle : toggleBug,
+				remove : removeBug
+			};
+		});
+
+		bugTrackerApp.controller("bugsController", function($scope, bugStorage){
+			
+			
+
+			$scope.bugs = bugStorage.getAll();
 
 			$scope.addNew = function(newBugName){
-				var newBug = bugOperations.createNew(newBugName);
+				var newBug = bugStorage.addNew(newBugName);
 				$scope.bugs.push(newBug);
 			};
 
 			$scope.toggle = function(bug){
-				bugOperations.toggle(bug);
+				bugStorage.toggle(bug);
 			};
 
 			$scope.removeClosed = function(){
 				for(var index = $scope.bugs.length-1; index >= 0; index--){
-					if ($scope.bugs[index].isClosed)
+					if ($scope.bugs[index].isClosed){
+						bugStorage.remove($scope.bugs[index]);
 						$scope.bugs.splice(index,1);
+					}
 				}
 			};
 
